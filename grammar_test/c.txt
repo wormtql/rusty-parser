@@ -1,0 +1,108 @@
+primaryExpression
+    @Identifier
+    @IntegerConstant
+    @FloatingConstant
+    @CharacterConstant
+    @StringLiteral
+    @( expression @)
+
+argumentList
+    EMPTY
+    expression
+    expression @, argumentList
+
+postfixExpression
+    primaryExpression @( argumentList @)
+    primaryExpression @[ expression @]
+    @++ primaryExpression
+    @-- primaryExpression
+
+unaryExpression
+    postfixExpression
+    @& unaryExpression
+    @* unaryExpression
+    @+ unaryExpression
+    @- unaryExpression
+    @~ unaryExpression
+    @! unaryExpression
+    @sizeof @( unaryExpression @)
+
+castExpression
+    unaryExpression
+    @( typeName @) castExpression
+
+multiplicativeExpression
+    castExpression @* multiplicativeExpression
+    castExpression @/ multiplicativeExpression
+    castExpression @% multiplicativeExpression
+    castExpression
+
+additiveExpression
+    multiplicativeExpression @+ additiveExpression
+    multiplicativeExpression @- additiveExpression
+    multiplicativeExpression
+
+shiftExpression
+    additiveExpression @<< shiftExpression
+    additiveExpression @>> shiftExpression
+    additiveExpression
+
+relationalExpression
+    shiftExpression @< relationalExpression
+    shiftExpression @<= relationalExpression
+    shiftExpression @> relationalExpression
+    shiftExpression @>= relationalExpression
+    shiftExpression
+
+equalityExpression
+    relationalExpression @== equalityExpression
+    relationalExpression @!= equalityExpression
+    relationalExpression
+
+andExpression
+    equalityExpression @& andExpression
+    equalityExpression
+
+xorExpression
+    andExpression @^ xorExpression
+    andExpression
+
+orExpression
+    xorExpression @| orExpression
+    xorExpression
+
+logicalAndExpression
+    orExpression @&& logicalAndExpression
+    orExpression
+
+logicalOrExpression
+    logicalAndExpression @|| logicalOrExpression
+    logicalAndExpression
+
+conditionExpression
+    logicalOrExpression
+    logicalOrExpression @? expression @: conditionExpression
+
+assignmentExpression
+    conditionExpression
+    unaryExpression @= assignmentExpression
+    unaryExpression @*= assignmentExpression
+    unaryExpression @+= assignmentExpression
+    unaryExpression @-= assignmentExpression
+    unaryExpression @/= assignmentExpression
+    unaryExpression @%= assignmentExpression
+    unaryExpression @<<= assignmentExpression
+    unaryExpression @>>= assignmentExpression
+    unaryExpression @|= assignmentExpression
+    unaryExpression @&= assignmentExpression
+    unaryExpression @^= assignmentExpression
+
+ORIGIN expression
+    assignmentExpression
+    assignmentExpression @, assignmentExpression
+
+typeName
+    @int
+    @long
+    @float
+    @double

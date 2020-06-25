@@ -1,0 +1,60 @@
+primaryExpression
+    @Identifier
+    @IntegerConstant
+    @FloatingConstant
+    @CharacterConstant
+    @StringLiteral
+    @( expression @)
+
+postfixExpression
+    primaryExpression @++
+    primaryExpression @--
+
+arrayAccess
+    primaryExpression @[ expression @]
+
+functionCall
+    primaryExpression @( argumentList @)
+
+argumentList
+    EMPTY
+    expression
+    expression @, argumentList
+
+unitExpression
+    postfixExpression
+    arrayAccess
+    functionCall
+
+assignExpression
+    unitExpression @= assignExpression
+
+binaryExpression
+    binaryExpression @+ unitExpression
+
+unaryExpression
+    @++ unitExpression
+    @-- unitExpression
+
+conditionExpression
+    unaryExpression @? expression @: expression
+
+castExpression
+    @( typeName @) primaryExpression
+
+ORIGIN expression
+    postfixExpression
+    primaryExpression
+    arrayAccess
+    functionCall
+    assignExpression
+    binaryExpression
+    unaryExpression
+    castExpression
+    conditionExpression
+
+typeName
+    @int
+    @long
+    @float
+    @double
