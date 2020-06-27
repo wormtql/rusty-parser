@@ -49,7 +49,7 @@ fn input_token_stream() -> TokenStream {
 
 fn main() {
     let matches = App::new("Exam Cheater")
-        .version("0.4.1")
+        .version("0.5.0")
         .author("wormtql <584130248@qq.com>")
         .arg(Arg::with_name("lr0_family")
                 .long("lr0f")
@@ -154,6 +154,14 @@ fn main() {
                 .long("fa-erlian")
                 .takes_value(false)
                 .help("convert NFA to DFA and minimize DFA"))
+        .arg(Arg::with_name("gen_kill")
+                .long("gen-kill")
+                .takes_value(true)
+                .help("calc GEN/KILL set"))
+        .arg(Arg::with_name("use_def")
+                .long("use-def")
+                .takes_value(true)
+                .help("calc USE/DEF set"))
         .get_matches();
     
     // check if seed exists, if not, cannot use any functions;
@@ -206,7 +214,7 @@ fn main() {
         let gen_kill = ud::load_gen_kill_from_file(temp[1]);
 
         let (ans, table) = ud::calc_with_process(&graph, &gen_kill);
-        let table2 = ud::get_table(&ans);
+        let table2 = ud::get_table(&ans, "IN", "OUT");
 
         println!("process:\n{}", table);
         println!("{}", table2);
@@ -221,10 +229,32 @@ fn main() {
         let use_def = du::load_use_def_from_file(temp[1]);
 
         let (ans, table) = du::calc_with_process(&graph, &use_def);
-        let table2 = du::get_table(&ans);
+        let table2 = du::get_table(&ans, "IN_L", "OUT_L");
 
         println!("process:\n{}", table);
         println!("{}", table2);
+        return;
+    }
+
+    // gen kill
+    if matches.is_present("gen_kill") {
+        let file = matches.value_of("gen_kill").unwrap();
+
+        let gk = ud::calc_gen_kill_from_file(&file);
+        let table = ud::get_table(&gk, "GEN", "KILL");
+
+        println!("{}", table);
+        return;
+    }
+
+    // use def
+    if matches.is_present("use_def") {
+        let file = matches.value_of("use_def").unwrap();
+
+        let ud = du::calc_use_def_from_file(&file);
+        let table = du::get_table(&ud, "USE", "DEF");
+
+        println!("{}", table);
         return;
     }
 

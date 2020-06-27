@@ -13,7 +13,7 @@ use std::fs;
 use std::iter;
 
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone)]
 pub struct Grammar {
     // rules
     pub rules: Vec<Rule>,
@@ -251,10 +251,6 @@ impl Grammar {
 
         Grammar::from_rules(rules, origin)
     }
-
-    // pub fn eliminate_left_recursion(&self) -> Grammar {
-
-    // }
 }
 
 #[cfg(test)]

@@ -45,6 +45,74 @@ pub fn load_use_def_from_file(file: &str) -> List {
     ans
 }
 
+pub fn calc_use_def_from_file(file: &str) -> List {
+    let contents = fs::read_to_string(file).unwrap();
+
+    let mut ans: List = Vec::new();
+    let mut counter = 0;
+    let mut temp: Vec<Vec<(usize, String, Vec<String>)>> = Vec::new();
+    temp.push(Vec::new());
+
+    for i in contents.trim().lines() {
+        if i == "" {
+            counter += 1;
+            temp.push(Vec::new());
+        } else {
+            let t1: Vec<&str> = i.split(":").collect();
+            let point_name = String::from(t1[0].trim());
+            let point_name: usize = (&point_name[1..]).parse().unwrap();
+
+            let t2: Vec<&str> = t1[1].split("=").collect();
+            let def_var = String::from(t2[0].trim());
+            let use_var: Vec<String> = t2[1].trim().split_whitespace().map(|x| String::from(x)).collect();
+
+            temp[counter].push((point_name, def_var, use_var));
+        }
+    }
+
+    for (index, block) in temp.iter().enumerate() {
+        let mut def: HashSet<String> = HashSet::new();
+
+        let mut use_set: HashSet<(String, usize)> = HashSet::new();
+        let mut def_set: HashSet<(String, usize)> = HashSet::new();
+
+        for (i, (point, left, uses)) in block.iter().enumerate() {
+            // update USE set
+            for u in uses.iter() {
+                if !def.contains(u) {
+                    use_set.insert((u.clone(), *point));
+                }
+            }
+
+            // update DEF set
+            for j in i + 1..block.len() {
+                for k in 0..block[j].2.len() {
+                    if block[j].2[k] == *left {
+                        def_set.insert((left.clone(), block[j].0));
+                    }
+                }
+            }
+            for j in 0..temp.len() {
+                if j != index {
+                    for k in 0..temp[j].len() {
+                        for u in 0..temp[j][k].2.len() {
+                            if temp[j][k].2[u] == *left {
+                                def_set.insert((left.clone(), temp[j][k].0));
+                            }
+                        }
+                    }
+                }
+            }
+
+            def.insert(left.clone());
+        }
+
+        ans.push((use_set, def_set));
+    }
+
+    ans
+}
+
 pub fn calc_with_process(g: &Graph<(), ()>, use_def: &List) -> (List, Table) {
     let mut table = Table::new();
     let mut ans: List = Vec::new();
@@ -127,13 +195,13 @@ fn format_helper(v: &HashSet<(String, usize)>) -> String {
     ans
 }
 
-pub fn get_table(v: &List) -> Table {
+pub fn get_table(v: &List, col1: &str, col2: &str) -> Table {
     let mut table = Table::new();
 
     let mut header: Vec<Cell> = Vec::new();
     header.push(Cell::new(""));
-    header.push(Cell::new("IN_L"));
-    header.push(Cell::new("OUT_L"));
+    header.push(Cell::new(col1));
+    header.push(Cell::new(col2));
     table.add_row(Row::new(header));
 
     for i in 0..v.len() {

@@ -1,0 +1,10 @@
+d1: a=b c
+d2: d=a
+d3: e=d f
+
+d4: f=e
+
+d5: b=d e
+d6: e=e
+
+d7: b=f c

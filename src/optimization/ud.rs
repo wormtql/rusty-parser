@@ -24,6 +24,53 @@ pub fn load_gen_kill_from_file(file: &str) -> List {
     ans
 }
 
+pub fn calc_gen_kill_from_file(file: &str) -> List {
+    let contents = fs::read_to_string(file).unwrap();
+
+    let mut ans: List = Vec::new();
+    let mut counter = 0;
+    let mut temp: Vec<Vec<(usize, String, Vec<String>)>> = Vec::new();
+    temp.push(Vec::new());
+
+    for i in contents.trim().lines() {
+        if i == "" {
+            counter += 1;
+            temp.push(Vec::new());
+        } else {
+            let t1: Vec<&str> = i.split(":").collect();
+            let point_name = String::from(t1[0].trim());
+            let point_name: usize = (&point_name[1..]).parse().unwrap();
+
+            let t2: Vec<&str> = t1[1].split("=").collect();
+            let def_var = String::from(t2[0].trim());
+            let use_var: Vec<String> = t2[1].trim().split_whitespace().map(|x| String::from(x)).collect();
+
+            temp[counter].push((point_name, def_var, use_var));
+        }
+    }
+
+    for (index, block) in temp.iter().enumerate() {
+        let mut gen: HashSet<usize> = HashSet::new();
+        let mut kill: HashSet<usize> = HashSet::new();
+
+        for (point, left, uses) in block.iter() {
+            gen.insert(*point);
+            // find all other def point
+            for j in 0..temp.len() {
+                for k in 0..temp[j].len() {
+                    if j != index && temp[j][k].1 == *left {
+                        kill.insert(temp[j][k].0);
+                    }
+                }
+            }
+        }
+
+        ans.push((gen, kill));
+    }
+
+    ans
+}
+
 pub fn calc_with_process(g: &Graph<(), ()>, gk: &List) -> (List, Table) {
     let mut ans: List = Vec::new();
     let mut table = Table::new();
@@ -86,13 +133,13 @@ pub fn calc_with_process(g: &Graph<(), ()>, gk: &List) -> (List, Table) {
     (ans, table)
 }
 
-pub fn get_table(v: &List) -> Table {
+pub fn get_table(v: &List, col1: &str, col2: &str) -> Table {
     let mut table = Table::new();
 
     let mut header: Vec<Cell> = Vec::new();
     header.push(Cell::new(""));
-    header.push(Cell::new("IN"));
-    header.push(Cell::new("OUT"));
+    header.push(Cell::new(col1));
+    header.push(Cell::new(col2));
     table.add_row(Row::new(header));
 
     for i in 0..v.len() {
