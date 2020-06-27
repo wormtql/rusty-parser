@@ -10,7 +10,7 @@ linux/macos（大概）:
 export SEED=10086
 ```
 只要种子一样，所有的结果都是相同的
-### 语法文件的格式
+### 语法文件的格式（grammar）
 ```
 ORIGIN S
     A B
@@ -30,8 +30,9 @@ S -> AB|BA
 A -> aA|ε
 B -> bB|ε
 ```
+注：语法之间空一行，产生式之前为4个空格
 
-### 自动机文件的格式
+### 自动机文件的格式（fa）
 ```
 <origin>
 <end1> <end2> ... <endx>
@@ -56,7 +57,7 @@ a b
 2 a 3 b 1
 ```
 
-### GEN/KILL文件格式
+### GEN/KILL文件格式（该功能应该用不到）
 ```
 <g1> <g2> ... <gn>, <k1> <k2> ... <kn>
 ...
@@ -71,7 +72,7 @@ a b
 10 11, 1 2 6
 ```
 
-### USE/DEF文件格式
+### USE/DEF文件格式（该功能应该用不到）
 ```
 , B: 3 6 7 8 11; C: 3 4 5 6 8 11
 B: 3; C: 3 4, A: 7; D: 5 10 11
@@ -84,7 +85,7 @@ C: 10; D: 10 11, B: 3 6 7 8; C: 3 4 5 6 8
 USE与DEF用","分隔，不同字母的引用点用";"分隔，不同引用点用空格分隔
 
 
-### 图（程序控制流图）格式
+### 图（程序控制流图）格式（graph）
 ```
 <edge_count1> <to1> <to2> ... <ton>
 ...
@@ -102,7 +103,7 @@ USE与DEF用","分隔，不同字母的引用点用";"分隔，不同引用点�
 0
 ```
 
-### 数据流图块文件
+### 数据流图块文件（block）
 ```
 d1: a=b c
 d2: d=a
@@ -140,7 +141,10 @@ d7: b=f c
 exam --help
 exam --file grammar.txt --lr0f
 exam --file grammar.txt --is-lalr1
-exam --ud graph.txt gen_kill.txt
-exam --du graph.txt use_def.txt
-exam --nfa2dfa --file xxx.nfa
+
+exam --gen-kill graph.txt block.txt
+exam --use-def graph.txt block.txt
+exam --nfa2dfa --file fa.nfa
+exam --fa-erlian --file fa.dfa
+exam --dom --file graph.txt
 ```
