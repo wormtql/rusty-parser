@@ -157,10 +157,12 @@ fn main() {
         .arg(Arg::with_name("gen_kill")
                 .long("gen-kill")
                 .takes_value(true)
+                .number_of_values(2)
                 .help("calc GEN/KILL set"))
         .arg(Arg::with_name("use_def")
                 .long("use-def")
                 .takes_value(true)
+                .number_of_values(2)
                 .help("calc USE/DEF set"))
         .get_matches();
     
@@ -202,7 +204,7 @@ fn main() {
 
         println!("split:\n{}", t1);
         println!("result:\n{}", t2);
-        println!("DFA after minimize:\n{}", dfa);
+        println!("DFA after minimize:\n{}", dfa2);
         return;
     }
 
@@ -238,23 +240,39 @@ fn main() {
 
     // gen kill
     if matches.is_present("gen_kill") {
-        let file = matches.value_of("gen_kill").unwrap();
+        let temp: Vec<&str> = matches.values_of("gen_kill").unwrap().collect();
 
-        let gk = ud::calc_gen_kill_from_file(&file);
-        let table = ud::get_table(&gk, "GEN", "KILL");
+        let graph = dominant::graph_from_file(temp[0]);
+        let gen_kill = ud::calc_gen_kill_from_file(temp[1]);
+        let table1 = ud::get_table(&gen_kill, "GEN", "KILL");
+        println!("GEN/KILL:\n{}", table1);
 
-        println!("{}", table);
+        let (ans, table2) = ud::calc_with_process(&graph, &gen_kill);
+        let table3 = ud::get_table(&ans, "IN", "OUT");
+
+        
+        println!("process:\n{}", table2);
+        println!("{}", table3);
+
         return;
     }
 
     // use def
     if matches.is_present("use_def") {
-        let file = matches.value_of("use_def").unwrap();
+        let temp: Vec<&str> = matches.values_of("use_def").unwrap().collect();
 
-        let ud = du::calc_use_def_from_file(&file);
-        let table = du::get_table(&ud, "USE", "DEF");
+        let graph = dominant::graph_from_file(temp[0]);
+        let use_def = du::calc_use_def_from_file(temp[1]);
+        let table1 = du::get_table(&use_def, "USE", "DEF");
 
-        println!("{}", table);
+        println!("USE/DEF:\n{}", table1);
+
+        let (ans, table2) = du::calc_with_process(&graph, &use_def);
+        let table3 = du::get_table(&ans, "IN_L", "OUT_L");
+
+        println!("process:\n{}", table2);
+        println!("{}", table3);
+
         return;
     }
 
