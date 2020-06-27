@@ -105,18 +105,24 @@ USE与DEF用","分隔，不同字母的引用点用";"分隔，不同引用点�
 
 ### 数据流图块文件（block）
 ```
-d1: a=b c
-d2: d=a
-d3: e=d f
+d1: B=
+d2: C=
 
-d4: f=e
+d3: A=B C
+d4: D=A C
 
-d5: b=d e
-d6: e=e
+d5: D=C D
 
-d7: b=f c
+d6: C=B C
+d7: E=A B
+
+d8: D=B C
+d9: E=E
+
+d10: B=C D
+d11: C=B D
 ```
-
+上例对应习题8-13
 
 ### 功能
 - 计算LR(0)项目集规范族
